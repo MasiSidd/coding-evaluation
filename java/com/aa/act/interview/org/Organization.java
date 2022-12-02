@@ -21,7 +21,45 @@ public abstract class Organization {
 	 */
 	public Optional<Position> hire(Name person, String title) {
 		//your code here
+		if(title.equalsIgnoreCase("CEO")) {
+			Integer employeeIdentifier = (int) System.currentTimeMillis();
+			Employee emp = new Employee(employeeIdentifier, person);
+			Optional<Employee> employee = Optional.of(emp);
+			root.setEmployee(employee);
+		}else {
+			Position pos = root;
+			hireEmployee(person, title, pos);
+		}
+		 
 		return Optional.empty();
+	}
+
+	/**
+	 * @param person
+	 * @param title
+	 * @param pos
+	 */
+	private void hireEmployee(Name person, String title, Position pos) {
+		for(Position position : pos.getDirectReports())
+		{
+			if (position.getTitle() == title)
+			{
+				Integer employeeIdentifier = (int) ((int) System.currentTimeMillis()*Math.random());
+				Employee emp = new Employee(employeeIdentifier, person);
+				Optional<Employee> employee = Optional.of(emp);
+				if(!position.isFilled()) {
+					// if position is not filled hire current employee at the position
+					position.setEmployee(employee);	
+				}else {
+					// if position is already filled create a new position
+					// and add as a direct reportee to the 1 level above position
+					Position newPosition = new Position(title, emp);
+					pos.addDirectReport(newPosition);
+				}
+			}else {
+				hireEmployee(person, title, position);
+			}	
+		}
 	}
 
 	@Override
